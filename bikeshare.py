@@ -41,7 +41,7 @@ def get_filters():
 
     # get user input for day of week (all, monday, tuesday, ... sunday)
     while True:
-        day = input('Now, please select a day to filter by. Or type all to search all days. ''').lower()
+        day = input('Now, please select a weekday name to filter by. Or type all to search all days. ''').lower()
         days = ['monday','tuesday','wednesday','thursday','friday','saturday','sunday']
         if day in days:
             print('\nLet\'s pull up data for the day you selected: ''')
@@ -165,19 +165,37 @@ def user_stats(df):
     print('The count of customer and subscriber user types were: {}.'.format(user_types))
 
     # Display counts of gender
-    genders = df['Gender'].value_counts()
-    print('The gender counts of users were: {}.'.format(genders))
+    if 'Gender' in df:
+        genders = df['Gender'].value_counts()
+        print('The gender counts of users were: {}.'.format(genders))
+    else:
+        print('Gender stats cannot be calculated because Gender data does not exist in the dataset.')
 
     # Display earliest, most recent, and most common year of birth
-    earliest_birth_year = df['Birth Year'].min()
-    print('The earliest birth year of users were: {}.'.format(int(earliest_birth_year)))
-    latest_birth_year = df['Birth Year'].max()
-    print('The most recent birth year of users were: {}.'.format(int(latest_birth_year)))
-    most_common_birth_year = df['Birth Year'].mode()[0]
-    print('The most common birth year of users were: {}.'.format(int(most_common_birth_year)))
+    if 'Birth Year' in df:
+        earliest_birth_year = df['Birth Year'].min()
+        print('The earliest birth year of users were: {}.'.format(int(earliest_birth_year)))
+        latest_birth_year = df['Birth Year'].max()
+        print('The most recent birth year of users were: {}.'.format(int(latest_birth_year)))
+        most_common_birth_year = df['Birth Year'].mode()[0]
+        print('The most common birth year of users were: {}.'.format(int(most_common_birth_year)))
+    else:
+        print('Birth Year stats cannot be calculated because Birth Year data does not exist in the dataset.')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+
+
+def display_data(df):
+    """Displays the raw dataset to the user 5 rows at a time. Based on their input, 5 more rows at a time can be accessed."""
+    view_data = input('Would you like to view 5 rows of individual trip data? Enter yes or no? ''').lower()
+    start_loc = 0
+    while (view_data == 'yes'):
+        print(df.iloc[start_loc:start_loc +5])
+        start_loc += 5
+        view_display = input('Do you wish to continue and view another 5 rows of data?: ').lower()
+        if view_display.lower() != 'yes':
+            break
 
 
 def main():
@@ -189,6 +207,7 @@ def main():
         station_stats(df)
         trip_duration_stats(df)
         user_stats(df)
+        display_data(df)
 
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
